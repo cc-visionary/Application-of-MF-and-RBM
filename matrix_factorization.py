@@ -1,7 +1,7 @@
 # Code from : https://albertauyeung.github.io/2017/04/23/python-matrix-factorization.html/
 
 import numpy as np
-from rmse import rmse
+from mse import mse
 
 class MF():
     def __init__(self, R, K, alpha, beta, iterations):
@@ -46,7 +46,7 @@ class MF():
         for i in range(self.iterations):
             np.random.shuffle(self.samples)
             self.sgd()
-            error = rmse(self.R, self.full_matrix())
+            error = mse(self.R, self.full_matrix())
             training_process.append(error)
             print("Epoch: %d ; error = %.4f" % (i+1, error))
 
