@@ -49,14 +49,19 @@ class RBM(object):
         v1 = self.sample_prob(self.prob_v_given_h(h0, _w, _vb))
         h1 = self.prob_h_given_v(v1, _w, _hb)
         
+        # creating the gradients
         positive_grad = tf.matmul(tf.transpose(v0), h0)
         negative_grad = tf.matmul(tf.transpose(v1), h1)
         
-        update_w = _w + self.learning_rate * \
-            (positive_grad - negative_grad) / tf.to_float(tf.shape(v0)[0])
+        # calculates the contrastive divergence
+        contrastive_divergence = (positive_grad - negative_grad) / tf.to_float(tf.shape(v0)[0])
+        
+        # updates the weights and biases 
+        update_w = _w + self.learning_rate * contrastive_divergence
         update_vb = _vb +  self.learning_rate * tf.reduce_mean(v0 - v1, 0)
         update_hb = _hb +  self.learning_rate * tf.reduce_mean(h0 - h1, 0)
         
+        # calculates the MSE of non-zero / non-missing values
         zero = tf.constant(0, dtype=tf.float32)
         indices = tf.not_equal(X, zero)
         err = tf.reduce_mean(tf.square(v0[indices] - v1[indices]))
@@ -76,7 +81,7 @@ class RBM(object):
                     prv_hb = cur_hb
                     prv_vb = cur_vb
                 error = sess.run(err, feed_dict={v0: X, _w: cur_w, _vb: cur_vb, _hb: cur_hb})
-                print ('Epoch: %d' % epoch,'; reconstruction error: %f' % error)
+                print ('Epoch: %d' % epoch,'; reconstruction error: %.4f' % error)
                 error_list.append(error)
             self.w = prv_w
             self.hb = prv_hb
@@ -84,7 +89,6 @@ class RBM(object):
             return error_list
 
     def rbm_output(self, X):
-        
         input_X = tf.constant(X)
         _w = tf.constant(self.w)
         _hb = tf.constant(self.hb)
