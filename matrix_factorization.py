@@ -1,7 +1,7 @@
 # Code from : https://albertauyeung.github.io/2017/04/23/python-matrix-factorization.html/
 
 import numpy as np
-from mse import mse
+from metrics import mse
 
 class MF():
     def __init__(self, R, K, alpha, beta, iterations):

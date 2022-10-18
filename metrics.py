@@ -15,3 +15,14 @@ def mse(actual, predicted):
     for x, y in zip(xs, ys):
         error += pow(actual[x, y] - predicted[x, y], 2)
     return error / len(xs)
+
+def rmse(actual, predicted):
+    """
+    A function to compute the root mean square error of the non missing ratings
+    
+    Arguments
+        - actual (ndarray)   : actual user-item rating matrix
+        - predicted (int)   : predicted user-item rating matrix
+    """
+    indices = actual >= 0
+    return np.sqrt(np.mean(np.square(actual[indices] - predicted[indices])))
